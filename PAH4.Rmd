@@ -1,0 +1,131 @@
+---
+title: Homework 4
+author: |
+  | Author: Paige Anderson
+  | Student ID: 1001230795
+output: pdf_document
+fontsize: 12pt
+---
+
+## Description of the Design
+<p> For my experiment I conducted a $2^3$ replicated factorial experiment. For this experiment I was interested in the factors that would influence the number of times a ball would be caught between two people before it was dropped. I was inspired by an episode of Friends where a ball was passed for 10 hours without being dropped. The factors I chose to investigate were the size of the ball, the distance between people, and whether they were standing or sitting. Each treatment combination was tested twice so that it was replicated. The order in which the treatments were tested were randomized prior to the experiment. The ball was then passed with the corresponding treatment, and the number of times the ball was caught before it was dropped was recorded. <p>
+Link to the Friends reference: https://www.youtube.com/watch?v=Nfcv6XVlRAU 
+
+\begin{equation*}
+A = \begin{cases}
+             -1  & \text{if ball is small} \\
+             1  & \text{if ball is large }
+       \end{cases} \quad
+B = \begin{cases}
+             -1  & \text{if distance is close (2 metres)} \\
+             1  & \text{if distance is far (4 metres)} 
+       \end{cases} \quad
+C = \begin{cases}
+             -1  & \text{if standing} \\
+             1  & \text{if sitting} 
+       \end{cases}
+\end{equation*}
+
+The data that was collected:
+```{r, echo=FALSE, eval = TRUE, fig.height=3,fig.width=6}
+catch = read.table("/Users/paigeanderson/Desktop/STA305/Homework/H4/catch.csv", sep=",", header = TRUE)
+
+library(knitr)
+kable(catch)
+```
+
+\newpage
+
+## Analysis of the Data
+
+```{r, eval=T, echo=F, messages=F, warnings=F}
+suppressMessages(library("FrF2"))
+library(FrF2)
+
+mod1 = lm(y~A*B*C, data=catch)
+```
+
+```{r, eval=T, echo=F, messages=F, warnings=F}
+# Factorial effects
+summary(mod1)
+2*mod1$coefficients
+```
+
+<p> From the summary output, we can see that the only significant effect at the 0.05 level is the main effect of the size of the ball. This main effect can be interpreted as when the size of the ball changes from small to large, the average number of catches increases by 21.125. On the other hand, an interaction effect can be interpreted as the average change in the response due to moving from the low level to the high level of a factor, after fixing another factor. However, there is no evidence that any of the interaction effects are significant. <p>
+
+```{r, eval=T, echo=F, messages=F, warnings=F}
+# Confidence intervals for the true values of the effects
+round(2*confint.lm(mod1),2)
+```
+<p>The confidence interval supports the fact that the only significant effect is the size of the ball because 0 is not within the confidence interval. Additionally, 0 is within the confidence intervals for the other effects which supports that these effects are not significant effects. <p>
+
+```{r, echo=F}
+par(mfrow=c(1,3))
+interaction.plot(catch$A, catch$B, catch$y, type="l", xlab = "x1", 
+                 ylab="Mean Coliform Contribution", 
+                 main= "Interaction plot for A and B", trace.label="x2")
+
+interaction.plot(catch$A, catch$C, catch$y, type="l", xlab = "x1", 
+                 ylab="Mean Coliform Contribution", 
+                 main= "Interaction plot for A and C", trace.label="x2")
+
+interaction.plot(catch$B, catch$C, catch$y, type="l", xlab = "x1", 
+                 ylab="Mean Coliform Contribution", 
+                 main= "Interaction plot for B and C", trace.label="x2")
+```
+The interaction plots all have parralel lines which do not cross, which further demonstrates that there are no significant interaction effects present.
+
+```{r, eval=T, echo=F, messages=F, warnings=F}
+# Estimated variance of the effect
+2*coef(summary(mod1))[,"Std. Error"]
+```
+<p>The variance of the effects is 8.192031. If I were to repeat this experiment I would try to reduce this variance by ensuring the balls were of the same material, and also that the colours were the same. The small ball was green which made it more difficult to see as it blended in with the walls. <p>
+
+<p>I did not include a Lenth plot, Half-Normal plot, or a Normal Q-Q plot because the data is replicated.<p>
+
+\newpage
+
+## Conclusions
+
+<p> In conclusion, by changing the size of the ball from small to large the number of catches on average increases by 21.125. However, the effect of whether the people were close together or far apart does not change the average number of catches. Similarly, changing whether the people were sitting or standing also did not impact the average number of catches. There were also no significant interaction effects between the factors. <p>
+
+
+<p>Therefore, if I wanted to maximize the number of times we could catch a ball before dropping it I would use a large ball rather than a small one. Further, since there were no significant main effects for the distance, or whether we were standing or sitting, I would choose the most convenient level for each factor. <p>
+
+\newpage
+
+## Appendix
+
+
+```{r, echo=T, eval=F, messages=F, warnings=F}
+catch = read.table("/Users/paigeanderson/Desktop/STA305/Homework/H4/catch.csv", 
+                   sep=",", header = TRUE)
+
+library(knitr)
+kable(catch)
+
+mod1 = lm(y~A*B*C, data=catch)
+
+# Factorial effects
+summary(mod1)
+2*mod1$coefficients
+
+# Confidence intervals for the true values of the effects
+round(2*confint.lm(mod1),2)
+
+par(mfrow=c(1,3))
+interaction.plot(catch$A, catch$B, catch$y, type="l", xlab = "x1", 
+                 ylab="Mean Coliform Contribution", 
+                 main= "Interaction plot for A and B", trace.label="x2")
+
+interaction.plot(catch$A, catch$C, catch$y, type="l", xlab = "x1", 
+                 ylab="Mean Coliform Contribution", 
+                 main= "Interaction plot for A and C", trace.label="x2")
+
+interaction.plot(catch$B, catch$C, catch$y, type="l", xlab = "x1", 
+                 ylab="Mean Coliform Contribution", 
+                 main= "Interaction plot for B and C", trace.label="x2")
+
+# Estimated variance of the effect
+2*coef(summary(mod1))[,"Std. Error"]
+```
